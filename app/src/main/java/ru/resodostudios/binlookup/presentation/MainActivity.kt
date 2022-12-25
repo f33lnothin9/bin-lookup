@@ -1,18 +1,24 @@
-package ru.resodostudios.binlookup
+package ru.resodostudios.binlookup.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.rememberNavController
+import ru.resodostudios.binlookup.presentation.navigation.NavGraph
 import ru.resodostudios.binlookup.presentation.ui.theme.BINLookupTheme
 
+@ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         setContent {
             BINLookupTheme {
+                val navController = rememberNavController()
 
+                NavGraph(navController = navController)
             }
         }
     }
