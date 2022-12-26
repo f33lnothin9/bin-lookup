@@ -1,5 +1,9 @@
 package ru.resodostudios.binlookup.presentation.screens.history
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,8 +36,8 @@ import java.util.*
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
-
     val card = viewModel.card.observeAsState().value
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -53,7 +58,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(start = 16.dp, end = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 content = {
                     var text by remember { mutableStateOf("") }
 
@@ -76,8 +81,6 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
                             }
                         )
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
 
                     Headline(title = "Scheme")
 
@@ -108,8 +111,40 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
                         CapitalizedText(text = (card?.bank?.name + ", "))
                         CapitalizedText(text = card?.bank?.city ?: "-")
                     }
-                    Text(text = card?.bank?.url ?: "-")
-                    CapitalizedText(text = card?.bank?.phone ?: "-")
+                    Text(
+                        text = card?.bank?.url ?: "-",
+                        modifier = Modifier.clickable {
+                            if (card?.bank?.url != null) {
+                                val uri = Uri.parse(("https://" + card.bank.url))
+                                val intent = Intent(Intent.ACTION_VIEW, uri)
+
+                                try {
+                                    context.startActivity(intent)
+                                } catch (s: SecurityException) {
+
+                                    Toast.makeText(context, "An error occurred", Toast.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
+                        }
+                    )
+                    Text(
+                        text = card?.bank?.phone ?: "-",
+                        modifier = Modifier.clickable {
+                            if (card?.bank?.url != null) {
+                                val uri = Uri.parse(("tel:" + card.bank.phone))
+                                val intent = Intent(Intent.ACTION_DIAL, uri)
+
+                                try {
+                                    context.startActivity(intent)
+                                } catch (s: SecurityException) {
+
+                                    Toast.makeText(context, "An error occurred", Toast.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
+                        }
+                    )
                 }
             )
         }
@@ -120,7 +155,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
 fun Headline(title: String) {
     Text(
         text = title,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.SemiBold,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         style = AppTypography.labelLarge,
